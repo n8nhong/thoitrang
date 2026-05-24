@@ -1,0 +1,1628 @@
+887-  return (
+888-    <div className={cn("relative", isFullscreen ? "h-full flex flex-col gap-3" : "space-y-6")} translate="no">
+889-      <audio ref={audioRef} src={bgMusicUrl} loop />
+890-      <div className={cn("flex flex-wrap items-center justify-between gap-3", isFullscreen && "shrink-0")}>
+891-        <div className="flex flex-wrap items-center gap-3">
+892:          <button 
+893-            onClick={() => {
+894-              if (disabled) {
+895-                alert(disabledMessage || "Chưa sẵn sàng để phát.");
+896-                return;
+897-              }
+898-              isSpeaking ? stopSpeech() : startSpeech();
+899-            }}
+900-            className={cn(
+901-              "flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all shadow-sm",
+902-              disabled ? "bg-gray-300 text-gray-500 cursor-not-allowed" : "bg-[#1A1A1A] text-white hover:bg-black"
+903-            )}
+904-          >
+905-            {isSpeaking ? <><VolumeX className="w-3 h-3 animate-pulse" /> Dừng</> : <><Play className="w-3 h-3" /> Nghe tư vấn</>}
+906-          </button>
+907-          
+908-          {aiFullAudio && selectedVoiceURI === 'UPLOADED_VOICE' && !isSpeaking && !isRecording && (
+909-            <div className="flex items-center gap-2">
+910-               <a 
+911-                 href={aiFullAudio}
+912-                 download={`giong-doc-hoan-chinh-${Date.now()}.mp3`}
+--
+917-            </div>
+918-          )}
+919-
+920-          {!isSpeaking && !isRecording && (
+921-            <div className="flex items-center gap-2">
+922:              <button 
+923-                onClick={handleStartRecording}
+924-                className={cn(
+925-                  "flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all shadow-sm",
+926-                  disabled ? "bg-gray-300 text-gray-500 cursor-not-allowed bg-opacity-50" : "bg-red-50 text-red-600 hover:bg-red-100 border border-red-100"
+927-                )}
+928-                title="Quay MP4"
+929-              >
+930-                <Video className="w-3 h-3" /> Quay MP4
+931-              </button>
+932-              
+933-              <label className="flex items-center gap-1.5 cursor-pointer text-[10px] font-bold uppercase tracking-wider text-[#A09A94] hover:text-[#1A1A1A] transition-colors bg-[#F9F8F6] px-3 py-2 rounded-full border border-[#DDD6CE] shadow-sm select-none">
+934-                <input 
+935-                  type="checkbox" 
+936-                  checked={recordWithAudio} 
+937-                  onChange={(e) => {
+938-                    setRecordWithAudio(e.target.checked);
+939-                    localStorage.setItem('boutique_record_audio', String(e.target.checked));
+940-                  }}
+941-                  className="rounded border-[#DDD6CE] text-red-600 focus:ring-red-500 w-3' h-3' cursor-pointer" 
+942-                  style={{ width: '12px', height: '12px' }}
+--
+944-                <span>Kèm âm thanh</span>
+945-              </label>
+946-            </div>
+947-          )}
+948-
+949:          <button 
+950-            onClick={() => {
+951-              if (aiFullAudio) {
+952-                 const a = document.createElement('a');
+953-                 a.href = aiFullAudio;
+954-                 const ext = aiFullAudio.includes('audio/ogg') ? 'ogg' : aiFullAudio.includes('audio/mpeg') ? 'mp3' : 'wav';
+955-                 a.download = `voice-ai-${Date.now()}.${ext}`;
+956-                 a.click();
+957-              } else {
+958-                 alert("Tính năng Xuất trực tiếp Audio (.mp3) hiện đang bảo trì hoặc dành riêng cho hạng VIP. Quý khách vui lòng chuyển sang giọng Đọc biểu cảm (AI) để tạo và tải, hoặc dùng chức năng Quay Màn Hình thông thường để thu cả Ảnh và Tiếng.");
+959-              }
+960-            }}
+961-            className="flex items-center gap-2 px-3 py-2 bg-[#F9F8F6] text-[#A09A94] hover:text-[#1A1A1A] border border-[#DDD6CE] text-[10px] font-bold uppercase tracking-widest rounded-full transition-all"
+962-            title="Tải nhạc Audio tư vấn"
+963-          >
+964-            <Download className="w-3 h-3" /> Tải MP3/Audio
+965-          </button>
+966-          
+967-          {!isFullscreen && (
+968:            <button
+969-              onClick={() => setShowMusicInput(!showMusicInput)}
+970-              className={cn(
+971-                "flex items-center gap-2 px-3 py-2 text-[10px] font-bold uppercase tracking-widest rounded-full transition-all border",
+972-                showMusicInput || bgMusicUrl ? "bg-amber-100 text-amber-700 border-amber-200" : "bg-[#F9F8F6] text-[#A09A94] hover:bg-[#EEEAE5] border-[#DDD6CE]"
+973-              )}
+974-            >
+975-              <Music className="w-3 h-3" /> Nhạc nền
+976-            </button>
+977-          )}
+978-
+979-          {!isFullscreen && (
+980-            <div className="flex flex-col gap-2 relative">
+981-              <div className="flex bg-[#F9F8F6] hover:bg-[#EEEAE5] border border-[#DDD6CE] py-1.5 rounded-full items-center px-3 transition-colors shrink-0 gap-2" title="Cài đặt giọng đọc">
+982-                <select 
+983-                  value={selectedVoiceURI} 
+984-                  onChange={handleVoiceChange}
+985-                  className="bg-transparent text-[10px] font-bold uppercase outline-none max-w-[150px] truncate text-[#1A1A1A] cursor-pointer"
+986-                >
+987-                  <option value="GT_Female">Nữ (Hệ Thống - Chuẩn)</option>
+988-                  <option value="UPLOADED_VOICE">Giọng Tải Lên (MP3/WAV)</option>
+--
+1044-           </div>
+1045-          )}
+1046-
+1047-          {!isFullscreen && (
+1048-            <div className="flex bg-[#EEEAE5] p-1 rounded-full items-center gap-0.5">
+1049:            <button 
+1050-              onClick={() => {setIsKaraokeMode(true); setIsEditing(false);}}
+1051-              className={cn("px-2 sm:px-3 py-1.5 rounded-[1.5rem] text-[9px] sm:text-[10px] font-bold uppercase transition-all", isKaraokeMode && !isEditing ? "bg-white shadow-sm" : "text-[#7A7570] hover:text-[#1A1A1A]")}
+1052-            >
+1053-              Karaoke
+1054-            </button>
+1055:            <button 
+1056-              onClick={() => {setIsKaraokeMode(false); setIsEditing(false);}}
+1057-              className={cn("px-2 sm:px-3 py-1.5 rounded-[1.5rem] text-[9px] sm:text-[10px] font-bold uppercase transition-all", !isKaraokeMode && !isEditing ? "bg-white shadow-sm" : "text-[#7A7570] hover:text-[#1A1A1A]")}
+1058-            >
+1059-              Toàn bộ
+1060-            </button>
+1061:            <button
+1062-               onClick={() => setIsEditing(!isEditing)}
+1063-               className={cn("px-2 sm:px-3 py-1.5 flex items-center gap-1 rounded-[1.5rem] text-[9px] sm:text-[10px] font-bold uppercase transition-all shadow-[0]", isEditing ? "bg-amber-100 text-amber-700 shadow-sm ring-1 ring-amber-300" : "text-[#7A7570] hover:bg-white/50")}
+1064-            >
+1065-               <Edit3 className="w-3 h-3" /> Sửa & Cảm Xúc
+1066-            </button>
+1067-            </div>
+1068-          )}
+1069-        </div>
+1070-
+1071-        {!isFullscreen && (
+1072-          <div className="flex gap-2">
+1073:            <button onClick={handleCopy} title="Sao chép" className="p-2 bg-white border border-[#EEEAE5] rounded-full hover:bg-[#F9F8F6] transition-colors"><Copy className="w-3 h-3" /></button>
+1074:            <button onClick={handleDownload} title="Tải xuống" className="p-2 bg-white border border-[#EEEAE5] rounded-full hover:bg-[#F9F8F6] transition-colors"><Download className="w-3 h-3" /></button>
+1075-          </div>
+1076-        )}
+1077-
+1078-        {isKaraokeMode && !isFullscreen && (
+1079-          <div className="flex gap-2 ml-auto items-center flex-wrap justify-end">
+1080-            {karaokeLayoutType === 'word' && (
+1081-              <div className="flex gap-2 items-center bg-[#F9F8F6] px-2 py-1 rounded-full text-[10px] uppercase font-bold text-[#4A4540]">
+1082-                <span>Vị trí:</span>
+1083-                <select value={wordStyleConfig.position} onChange={e => updateWordStyleConfig({position: e.target.value})} className="bg-transparent outline-none cursor-pointer border-b border-black/10">
+1084-                  <option value="top">Trên</option>
+1085-                  <option value="middle">Giữa</option>
+1086-                  <option value="bottom">Dưới</option>
+1087-                </select>
+1088-                <div className="w-[1px] h-3 bg-[#D4D0CB]" />
+1089-                <span title="Chữ To, Nhỏ">Aa:</span>
+1090-                <input type="range" min="30" max="150" value={wordStyleConfig.size || 100} onChange={e => updateWordStyleConfig({size: parseInt(e.target.value)})} className="w-12 h-1 bg-[#D4D0CB] rounded-lg appearance-none cursor-pointer" />
+1091-                <div className="w-[1px] h-3 bg-[#D4D0CB]" />
+1092-                <input type="color" value={wordStyleConfig.color || '#FFD700'} onChange={e => updateWordStyleConfig({color: e.target.value})} className="w-5 h-5 p-0 border-0 rounded cursor-pointer" title="Màu chữ" />
+1093-                <input type="color" value={wordStyleConfig.stroke || 'black'} onChange={e => updateWordStyleConfig({stroke: e.target.value})} className="w-5 h-5 p-0 border-0 rounded cursor-pointer" title="Màu viền" />
+1094-                <div className="w-[1px] h-3 bg-[#D4D0CB]" />
+--
+1139-              <option value="word">Từng Chữ Trên Video</option>
+1140-            </select>
+1141-            <div className="w-[1px] h-4 bg-[#EEEAE5]" />
+1142-            <div className="flex gap-1">
+1143-              {KARAOKE_STYLES.map(s => (
+1144:                <button 
+1145-                  key={s.id} 
+1146-                  onClick={() => {
+1147-                    setStyle(s);
+1148-                    localStorage.setItem('boutique_karaoke_style', s.id);
+1149-                    window.dispatchEvent(new Event('boutique_karaoke_layout_change'));
+1150-                  }}
+1151-                  className={cn(
+1152-                    "w-6 h-6 rounded-full border-2 transition-all",
+1153-                    style.id === s.id ? "border-[#1A1A1A]" : "border-transparent",
+1154-                    s.id === 'classic' ? "bg-yellow-100" : s.id === 'modern' ? "bg-gray-800" : s.id === 'gold' ? "bg-[#FFD700]" : "bg-purple-500"
+1155-                  )}
+1156-                />
+1157-              ))}
+1158-            </div>
+1159-          </div>
+1160-        )}
+1161-      </div>
+1162-
+1163-      {!isFullscreen && (
+1164-        <AnimatePresence>
+--
+1175-                  <span>Chọn Nhạc Nền TikTok</span>
+1176-                </label>
+1177-                <div className="flex flex-col gap-2">
+1178-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+1179-                    {PREDEFINED_MUSIC.map(m => (
+1180:                      <button
+1181-                        key={m.id}
+1182-                        onClick={() => {
+1183-                           setBgMusicName(m.name);
+1184-                           setBgMusicUrl(m.url);
+1185-                        }}
+1186-                        className={cn("px-2 py-1.5 text-[10px] rounded border text-left truncate transition-colors", bgMusicUrl === m.url ? "bg-amber-500 text-white border-amber-600 font-bold" : "bg-white text-amber-800 border-amber-200 hover:bg-amber-100")}
+1187-                      >
+1188-                        {m.name}
+1189-                      </button>
+1190-                    ))}
+1191-                  </div>
+1192-
+1193-                  <div className="flex gap-2 items-center mt-2">
+1194-                    <input 
+1195-                      type="file" 
+1196-                      accept="audio/*"
+1197-                      ref={audioInputRef}
+1198-                      className="hidden"
+1199-                      onChange={(e) => {
+1200-                        const file = e.target.files?.[0];
+--
+1202-                          setBgMusicName(file.name);
+1203-                          setBgMusicUrl(URL.createObjectURL(file));
+1204-                        }
+1205-                      }}
+1206-                    />
+1207:                    <button
+1208-                      onClick={() => audioInputRef.current?.click()}
+1209-                      className="flex-1 px-3 py-2 text-[10px] rounded-lg flex items-center justify-center gap-2 border border-amber-200 bg-white hover:bg-amber-50 text-amber-800 font-medium transition-colors"
+1210-                    >
+1211-                      <Upload className="w-3 h-3" /> Tải nhạc khác...
+1212-                    </button>
+1213-                    {bgMusicUrl && (
+1214:                      <button onClick={() => {
+1215-                        setBgMusicUrl('');
+1216-                        setBgMusicName('');
+1217-                        if (audioInputRef.current) audioInputRef.current.value = '';
+1218-                      }} className="p-2 border border-amber-200 bg-white text-amber-600 rounded-lg hover:bg-amber-100 px-3">
+1219-                        <X className="w-3 h-3" />
+1220-                      </button>
+1221-                    )}
+1222-                  </div>
+1223-                </div>
+1224-                <p className="text-[9px] text-amber-600/70 mt-1 italic">Nhạc sẽ tự phát kèm chữ karaoke và dừng khi kết thúc.</p>
+1225-              </div>
+1226-              <div className="flex flex-col gap-1">
+1227-                 <label className="text-[10px] font-bold uppercase tracking-widest text-amber-800">Âm lượng ({Math.round(musicVolume * 100)}%)</label>
+1228-                 <input 
+1229-                   type="range" 
+1230-                   min="0.0" 
+1231-                   max="1.0" 
+1232-                   step="0.05"
+1233-                   value={musicVolume}
+1234-                   onChange={e => setMusicVolume(parseFloat(e.target.value))}
+--
+1264-                 {label: 'Cười', emoji: '😄'}, {label: 'Khóc', emoji: '😭'}, 
+1265-                 {label: 'Mỉa mai', emoji: '😏'}, {label: 'Thì thầm', emoji: '🤫'}, 
+1266-                 {label: 'Tức giận', emoji: '😠'}, {label: 'Suỵt', emoji: '🤫'}, 
+1267-                 {label: 'Woàm', emoji: '🦁'}, {label: 'Hự', emoji: '🥊'}
+1268-               ].map(e => (
+1269:                 <button 
+1270-                   type="button"
+1271-                   key={e.label}
+1272-                   onClick={() => {
+1273-                     if (textareaRef.current) {
+1274-                        const start = textareaRef.current.selectionStart;
+1275-                        const end = textareaRef.current.selectionEnd;
+1276-                        const val = localText;
+1277-                        const insert = `[${e.label}] `;
+1278-                        setLocalText(val.substring(0, start) + insert + val.substring(end));
+1279-                        setTimeout(() => {
+1280-                           textareaRef.current?.focus();
+1281-                           textareaRef.current?.setSelectionRange(start + insert.length, start + insert.length);
+1282-                        }, 0);
+1283-                     } else {
+1284-                        setLocalText(prev => prev + ` [${e.label}] `);
+1285-                     }
+1286-                   }}
+1287-                   className="text-[10px] px-2 py-1.5 bg-amber-50 text-amber-800 rounded-lg border border-amber-200 hover:bg-amber-500 hover:text-white transition-all uppercase font-bold tracking-widest flex items-center gap-1 shadow-sm active:scale-95"
+1288-                 ><span>{e.emoji}</span> {e.label}</button>
+1289-               ))}
+--
+1454-  isGenerating?: boolean;
+1455-}) => {
+1456-  return (
+1457-    <div className="flex gap-2 overflow-x-auto py-2 px-1 w-full max-w-[240px] lg:max-w-[300px] mx-auto custom-scrollbar no-scrollbar">
+1458-      {history.map((url, idx) => (
+1459:        <button
+1460-          key={idx}
+1461-          onClick={() => onSetIndex(idx)}
+1462-          className={cn(
+1463-            "relative w-12 h-16 rounded-md overflow-hidden shrink-0 border-2 transition-all",
+1464-            idx === currentIndex ? "border-amber-500 scale-105 shadow-md" : "border-[#EEEAE5] opacity-60 hover:opacity-100"
+1465-          )}
+1466-        >
+1467-          <img src={url} className="w-full h-full object-cover" />
+1468-        </button>
+1469-      ))}
+1470-      {onRegen && (
+1471:        <button
+1472-          onClick={onRegen}
+1473-          disabled={isGenerating}
+1474-          title="Tạo thêm 1 phiên bản ảnh khác"
+1475-          className="relative w-12 h-16 rounded-md border-2 border-dashed border-[#DDD6CE] hover:border-[#A09A94] hover:bg-[#F9F8F6] shrink-0 flex items-center justify-center transition-all disabled:opacity-50"
+1476-        >
+1477-          {isGenerating ? <Loader2 className="w-5 h-5 animate-spin text-[#A09A94]" /> : <Plus className="w-5 h-5 text-[#A09A94]" />}
+1478-        </button>
+1479-      )}
+1480-    </div>
+1481-  );
+1482-};
+1483-
+1484-
+1485-const WatermarkHider = () => (
+1486-  <>
+1487-    <div className="absolute bottom-[2%] right-[2%] w-[6%] h-[3%] min-w-[30px] min-h-[16px] bg-[#0A0A0A]/90 blur-[2px] z-20 pointer-events-none mix-blend-difference rounded-tl-sm hidden md:block" />
+1488-    <div className="absolute bottom-[1%] right-[1%] w-[8%] h-[4%] min-w-[20px] min-h-[10px] bg-[#0A0A0A]/90 blur-[2px] z-20 pointer-events-none md:hidden rounded-tl-sm" />
+1489-  </>
+1490-);
+1491-
+--
+1610-    }
+1611-  };
+1612-
+1613-  return (
+1614-    <div className="absolute bottom-3 right-3 lg:bottom-4 lg:right-4 flex gap-2.5 lg:gap-2 opacity-50 group-hover:opacity-100 transition-opacity z-10">
+1615:      <button 
+1616-        onClick={handleDownload}
+1617-        className="p-3 lg:p-2 bg-purple-500 text-white rounded-full shadow-lg hover:bg-purple-600 transition-all transform hover:scale-110 active:scale-95"
+1618-        title="Tải ảnh về máy"
+1619-      >
+1620-        <Download className="w-4 h-4 lg:w-3.5 lg:h-3.5" />
+1621-      </button>
+1622-      {onPaste && (
+1623:        <button 
+1624-          onClick={handlePasteFromClipboard}
+1625-          className="p-3 lg:p-2 bg-blue-500 text-white rounded-full shadow-lg hover:bg-blue-600 transition-all transform hover:scale-110 active:scale-95"
+1626-          title="Dán ảnh kết quả từ Gemini"
+1627-        >
+1628-          <Save className="w-4 h-4 lg:w-3.5 lg:h-3.5" />
+1629-        </button>
+1630-      )}
+1631-      {prompt && (
+1632-        <>
+1633:          <button 
+1634-            onClick={handleCopyPromptOnly}
+1635-            className={cn(
+1636-              "p-3 lg:p-2 rounded-full shadow-lg transition-all transform hover:scale-110 active:scale-95",
+1637-              copied ? "bg-green-500 text-white" : "bg-white/95 backdrop-blur-sm text-gray-800 hover:bg-white"
+1638-            )}
+1639-            title="Sao chép Câu lệnh Ảnh"
+1640-          >
+1641-            <Copy className="w-4 h-4 lg:w-3.5 lg:h-3.5" />
+1642-          </button>
+1643:          <button 
+1644-            onClick={handleCopyVideoPrompt}
+1645-            className={cn(
+1646-              "p-3 lg:p-2 rounded-full shadow-lg transition-all transform hover:scale-110 active:scale-95",
+1647-              copied ? "bg-green-500 text-white" : "bg-white/95 backdrop-blur-sm text-amber-800 hover:bg-white"
+1648-            )}
+1649-            title="Sao chép Câu lệnh Video Veo3 8s"
+1650-          >
+1651-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 lg:w-3.5 lg:h-3.5"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+1652-          </button>
+1653-          <a 
+1654-            href="https://gemini.google.com/app"
+1655-            target="_blank"
+1656-            rel="noopener noreferrer"
+1657-            onClick={(e) => e.stopPropagation()}
+1658-            className="p-3 lg:p-2 bg-amber-500 text-white rounded-full shadow-lg hover:bg-amber-600 transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center"
+1659-            title="Mở Gemini để tạo ảnh chất lượng cao"
+1660-          >
+1661-            <ExternalLink className="w-4 h-4 lg:w-3.5 lg:h-3.5" />
+1662-          </a>
+1663-        </>
+1664-      )}
+1665:      <button 
+1666-        onClick={(e) => { e.stopPropagation(); copyImageToClipboard(url); }}
+1667-        className="p-3 lg:p-2 bg-white/95 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all transform hover:scale-110 active:scale-95"
+1668-        title="Sao chép ảnh AI"
+1669-      >
+1670-        <Copy className="w-4 h-4 lg:w-3.5 lg:h-3.5 text-[#1A1A1A]" />
+1671-      </button>
+1672:      <button 
+1673-        onClick={(e) => { e.stopPropagation(); downloadImage(url, `${name}.jpg`); }}
+1674-        className="p-3 lg:p-2 bg-white/95 backdrop-blur-sm rounded-full shadow-lg hover:bg-white transition-all transform hover:scale-110 active:scale-95"
+1675-        title="Tải ảnh xuống"
+1676-      >
+1677-        <Download className="w-4 h-4 lg:w-3.5 lg:h-3.5 text-[#1A1A1A]" />
+1678-      </button>
+1679-    </div>
+1680-  );
+1681-};
+1682-
+1683-// Helper for Social Contact
+1684-const SocialContactBadge = ({ links, darkTheme = false }: { links: any, darkTheme?: boolean }) => {
+1685-  if (!links.facebook && !links.tiktok && !links.zalo && !links.shopee) return null;
+1686-  return (
+1687-    <div className={cn("mt-8 p-5 rounded-3xl flex flex-col sm:flex-row items-center justify-between gap-4 backdrop-blur-md", darkTheme ? "bg-white/5 border border-white/10" : "bg-black/5 border border-black/10")}>
+1688-      <div className="space-y-1 text-center sm:text-left">
+1689-        <h4 className={cn("text-[10px] uppercase font-bold tracking-widest", darkTheme ? "text-white" : "text-[#1A1A1A]")}>Liên hệ Tư vấn viên</h4>
+1690-        <p className={cn("text-[9px]", darkTheme ? "text-white/60" : "text-[#7A7570]")}>Gặp trực tiếp tư vấn viên của bạn</p>
+1691-      </div>
+1692-      <div className="flex flex-wrap gap-4 items-center justify-center sm:justify-end">
+--
+3095-            <Shirt className="text-white w-4 h-4" />
+3096-          </div>
+3097-          <h1 className="text-lg font-semibold tracking-tight uppercase">Tư vấn thời trang AI</h1>
+3098-        </div>
+3099-        <div className="flex gap-4 md:gap-8 items-center overflow-x-auto no-scrollbar">
+3100:          <button 
+3101-            onClick={() => setActiveTab('consult')}
+3102-            className={cn(
+3103-              "text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-medium transition-colors whitespace-nowrap",
+3104-              activeTab === 'consult' ? "text-[#1A1A1A] border-b border-[#1A1A1A] pb-1" : "text-[#7A7570]"
+3105-            )}
+3106-          >
+3107-            Tư vấn phong cách
+3108-          </button>
+3109:          <button 
+3110-            onClick={() => setActiveTab('commentary')}
+3111-            className={cn(
+3112-              "text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-medium transition-colors whitespace-nowrap",
+3113-              activeTab === 'commentary' ? "text-[#1A1A1A] border-b border-[#1A1A1A] pb-1" : "text-[#7A7570]"
+3114-            )}
+3115-          >
+3116-            Bình luận trang phục
+3117-          </button>
+3118:          <button 
+3119-            onClick={() => setActiveTab('knowledge')}
+3120-            className={cn(
+3121-              "text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-medium transition-colors whitespace-nowrap",
+3122-              activeTab === 'knowledge' ? "text-[#1A1A1A] border-b border-[#1A1A1A] pb-1" : "text-[#7A7570]"
+3123-            )}
+3124-          >
+3125-            Kiến thức
+3126-          </button>
+3127:          <button 
+3128-            onClick={() => setActiveTab('user')}
+3129-            className={cn(
+3130-              "text-[10px] md:text-[11px] uppercase tracking-[0.2em] font-medium transition-colors whitespace-nowrap",
+3131-              activeTab === 'user' ? "text-[#1A1A1A] border-b border-[#1A1A1A] pb-1" : "text-[#7A7570]"
+3132-            )}
+3133-          >
+3134-            Người dùng
+3135-          </button>
+3136-        </div>
+3137-        
+3138-        <div className="flex items-center gap-2 md:gap-4 shrink-0">
+3139-          <select 
+3140-            value={imageModel} 
+3141-            onChange={(e) => {
+3142-              const val = e.target.value as 'imagen' | 'flux';
+3143-              setImageModel(val);
+3144-              localStorage.setItem('boutique_image_model', val);
+3145-              window.dispatchEvent(new Event('boutique_image_model_change'));
+3146-            }}
+3147-            className="hidden sm:block bg-transparent text-[10px] font-bold uppercase outline-none cursor-pointer text-[#1A1A1A] border border-[#EEEAE5] rounded-full px-3 py-1.5 hover:bg-[#F9F8F6] transition-colors"
+--
+3149-          >
+3150-            <option value="imagen">Imagen 3</option>
+3151-            <option value="flux">FLUX.1</option>
+3152-          </select>
+3153-          {!isPermanent && (
+3154:            <button 
+3155-              onClick={() => setShowTrialBlock(true)}
+3156-              className="px-3 md:px-4 py-1.5 md:py-2 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-full text-[9px] md:text-[10px] font-bold uppercase tracking-widest flex items-center gap-1 hover:shadow-lg transition-all"
+3157-            >
+3158-              <Sparkles className="w-3 h-3" />
+3159-              <span className="hidden sm:inline">Dùng thử (còn {Math.max(0, 3 - trialRuns)} lượt)</span>
+3160-              <span className="sm:hidden">{Math.max(0, 3 - trialRuns)}</span>
+3161-            </button>
+3162-          )}
+3163:          <button 
+3164-            onClick={() => setShowSettings(true)}
+3165-            className="p-2 text-[#7A7570] hover:text-[#1A1A1A] transition-colors"
+3166-          >
+3167-            <Settings className="w-4 h-4" />
+3168-          </button>
+3169:          <button 
+3170-            onClick={() => setShowHistory(true)}
+3171-            className="p-2 text-[#7A7570] hover:text-[#1A1A1A] transition-colors relative"
+3172-            title="Lịch sử"
+3173-          >
+3174-            <History className="w-4 h-4" />
+3175-            {history.length > 0 && <span className="absolute top-1 right-1 w-2 h-2 bg-[#1A1A1A] rounded-full border border-white" />}
+3176-          </button>
+3177-        </div>
+3178-      </header>
+3179-
+3180-      {/* Settings Modal */}
+3181-      <AnimatePresence>
+3182-        {showSettings && (
+3183-          <motion.div 
+3184-            initial={{ opacity: 0 }}
+3185-            animate={{ opacity: 1 }}
+3186-            exit={{ opacity: 0 }}
+3187-            className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/40 backdrop-blur-sm"
+3188-          >
+3189-            <motion.div 
+--
+3195-              <div className="flex items-center justify-between">
+3196-                <div className="space-y-1">
+3197-                  <h3 className="text-xl font-bold uppercase tracking-tight">Cấu hình hệ thống</h3>
+3198-                  <p className="text-[10px] text-[#A09A94] font-bold uppercase tracking-widest italic">● Dành riêng cho quản trị viên</p>
+3199-                </div>
+3200:                <button onClick={() => setShowSettings(false)}><X className="w-5 h-5 text-[#7A7570]" /></button>
+3201-              </div>
+3202-
+3203-              {!isAdminAuthenticated ? (
+3204-                <div className="space-y-6 py-10 flex flex-col items-center justify-center text-center">
+3205-                  <div className="w-12 h-12 bg-[#F9F8F6] rounded-full flex items-center justify-center mb-2">
+3206-                    <Database className="w-6 h-6 text-[#A09A94]" />
+3207-                  </div>
+3208-                  <div className="space-y-2 w-full">
+3209-                    <h4 className="text-xs font-bold uppercase tracking-widest">Yêu cầu xác thực</h4>
+3210-                    <p className="text-[10px] text-[#A09A94] uppercase tracking-widest">Nhập mật khẩu để truy cập quản trị</p>
+3211-                  </div>
+3212-                  <div className="w-full space-y-4">
+3213-                    <input 
+3214-                      type="password"
+3215-                      value={adminPassword}
+3216-                      onChange={(e) => setAdminPassword(e.target.value)}
+3217-                      onKeyDown={(e) => e.key === 'Enter' && handleAdminLogin()}
+3218-                      placeholder="••••••••"
+3219-                      className="w-full px-4 py-4 bg-[#F9F8F6] border border-[#EEEAE5] rounded-xl text-center text-lg tracking-[0.5em]"
+3220-                    />
+3221:                    <button 
+3222-                      onClick={handleAdminLogin}
+3223-                      className="w-full py-4 bg-[#1A1A1A] text-white rounded-xl text-[10px] font-bold uppercase tracking-widest"
+3224-                    >
+3225-                      Đăng nhập
+3226-                    </button>
+3227-                  </div>
+3228-                </div>
+3229-              ) : (
+3230-                <div className="space-y-6">
+3231-                  {/* Database Config Section */}
+3232-                  <div className="p-4 bg-[#F9F8F6] rounded-2xl border border-[#EEEAE5] space-y-4">
+3233-                    <div className="flex items-center justify-between">
+3234-                      <h4 className="text-[10px] font-bold uppercase tracking-widest text-[#1A1A1A]">Liên kết Supabase</h4>
+3235-                      <div className="flex items-center gap-1.5">
+3236-                        <span className={cn("w-1.5 h-1.5 rounded-full", dbStatus?.dbInitialized ? "bg-green-500" : "bg-red-500")} />
+3237-                        <span className="text-[8px] uppercase font-bold text-[#A09A94]">
+3238-                          {dbStatus?.dbInitialized ? "Đã kết nối" : "Chưa kết nối"}
+3239-                        </span>
+3240-                      </div>
+3241-                    </div>
+--
+3255-                          onChange={(e) => setSupabaseKey(e.target.value)}
+3256-                          placeholder="Dán Key Service Role tại đây"
+3257-                          className="w-full px-3 py-2 bg-white border border-[#EEEAE5] rounded-xl text-[10px]"
+3258-                        />
+3259-                      </div>
+3260:                      <button 
+3261-                        onClick={handleSetupDb}
+3262-                        className="w-full py-2 bg-[#1A1A1A] text-white rounded-lg text-[9px] font-bold uppercase tracking-widest"
+3263-                      >
+3264-                        Kết nối Supabase
+3265-                      </button>
+3266-
+3267-                      {dbStatus?.lastInitError && (
+3268-                        <div className="p-2 bg-red-50 rounded-lg">
+3269-                          <p className="text-[8px] text-red-600 font-bold uppercase leading-tight">Lỗi: {dbStatus.lastInitError}</p>
+3270-                        </div>
+3271-                      )}
+3272-                      
+3273-                      <div className="pt-2 border-t border-[#EEEAE5]/50">
+3274-                        <div className="flex items-center justify-between mb-2">
+3275-                          <span className="text-[8px] text-[#A09A94] uppercase font-bold tracking-widest">Cấu trúc database</span>
+3276:                          <button 
+3277-                            onClick={() => {
+3278-                              const sql = `-- 1. Bảng access_links
+3279-CREATE TABLE IF NOT EXISTS access_links (
+3280-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+3281-    token TEXT UNIQUE NOT NULL,
+3282-    label TEXT NOT NULL,
+3283-    active BOOLEAN DEFAULT TRUE,
+3284-    is_permanent BOOLEAN DEFAULT FALSE,
+3285-    created_at TIMESTAMPTZ DEFAULT NOW(),
+3286-    usage JSONB DEFAULT '{"pc": [], "tablet": [], "phone": []}'::JSONB
+3287-);
+3288-
+3289--- 2. Bảng gemini_keys
+3290-CREATE TABLE IF NOT EXISTS gemini_keys (
+3291-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+3292-    key TEXT NOT NULL,
+3293-    label TEXT NOT NULL,
+3294-    active BOOLEAN DEFAULT TRUE,
+3295-    status_message TEXT DEFAULT 'Chờ kiểm tra',
+3296-    last_checked TIMESTAMPTZ,
+--
+3400-                          rows={4}
+3401-                          className="w-full px-3 py-2 bg-[#F9F8F6] border border-[#EEEAE5] rounded-lg text-[11px] font-mono whitespace-pre-wrap focus:outline-none focus:border-[#1A1A1A] resize-none"
+3402-                        />
+3403-                      </div>
+3404-
+3405:                      <button 
+3406-                        onClick={saveMasterKey}
+3407-                        className="w-full py-3 bg-[#1A1A1A] text-white rounded-xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-black transition-all"
+3408-                        title="Lưu cấu hình"
+3409-                      >
+3410-                        <Save className="w-4 h-4" />
+3411-                        Lưu Thay Đổi Quản Trị Hệ Thống
+3412-                      </button>
+3413-                    </div>
+3414-
+3415-                    <div className="h-px bg-[#EEEAE5]" />
+3416-
+3417-                    <div className="flex items-center justify-between">
+3418-                      <div className="flex flex-col">
+3419-                        <h4 className="text-[10px] uppercase tracking-widest font-bold text-[#1A1A1A]">Quản lý Pool Key</h4>
+3420-                        <p className="text-[8px] text-[#A09A94] uppercase font-bold">Nhập nhiều key & Tự động quét</p>
+3421-                      </div>
+3422-                      <div className="flex items-center gap-2">
+3423-                        <a 
+3424-                          href={`https://supabase.com/dashboard/project/encpsaatojnxgyjjcvnx/editor`}
+3425-                          target="_blank"
+--
+3427-                          className="text-[8px] px-2 py-1 bg-white border border-[#EEEAE5] rounded shadow-sm font-bold uppercase transition-all hover:bg-blue-50 hover:text-blue-600 flex items-center gap-1"
+3428-                        >
+3429-                          <Database className="w-2.5 h-2.5" />
+3430-                          Mở Dashboard SQL
+3431-                        </a>
+3432:                        <button 
+3433-                          onClick={() => setShowRawData(!showRawData)}
+3434-                          className="text-[8px] px-2 py-1 bg-white border border-[#EEEAE5] rounded shadow-sm font-bold uppercase transition-all hover:bg-[#F9F8F6]"
+3435-                        >
+3436-                          {showRawData ? "Đóng Dữ Liệu" : "Xem Dữ Liệu Thô"}
+3437-                        </button>
+3438-                        <span className="text-[8px] uppercase font-bold text-[#A09A94] bg-[#F9F8F6] px-2 py-1 rounded">Tổng: {geminiKeys.length}</span>
+3439-                      </div>
+3440-                    </div>
+3441-
+3442-                    {showRawData && (
+3443-                      <div className="p-3 bg-black rounded-xl font-mono text-[9px] text-green-400 overflow-x-auto border border-green-900/30">
+3444-                        <pre>{JSON.stringify(geminiKeys, null, 2)}</pre>
+3445-                      </div>
+3446-                    )}
+3447-                    
+3448-                    <div className="space-y-2">
+3449-                      <div className="space-y-1">
+3450-                        <label className="text-[8px] font-bold uppercase text-[#7A7570] tracking-widest px-1">Nhập danh sách Key (Mỗi dòng 1 key)</label>
+3451-                        <textarea 
+3452-                          value={newGeminiKey}
+--
+3455-                          rows={3}
+3456-                          className="w-full px-4 py-3 bg-[#F9F8F6] border border-[#EEEAE5] rounded-xl text-xs font-mono custom-scrollbar resize-none focus:bg-white transition-colors"
+3457-                        />
+3458-                      </div>
+3459-                      <div className="flex gap-2">
+3460:                        <button 
+3461-                          onClick={handleCreateGeminiKey}
+3462-                          className="flex-1 py-2.5 bg-[#1A1A1A] text-white rounded-xl text-[10px] font-bold uppercase tracking-widest hover:bg-black transition-all shadow-lg active:scale-[0.98]"
+3463-                        >
+3464-                          Lưu & Thêm vào Pool
+3465-                        </button>
+3466:                        <button 
+3467-                          onClick={handleCheckAllKeys}
+3468-                          className={cn(
+3469-                            "px-4 py-2.5 border border-[#1A1A1A] text-[#1A1A1A] rounded-xl text-[10px] font-bold uppercase whitespace-nowrap transition-all",
+3470-                            checkingKeys.length > 0 ? "opacity-50 cursor-not-allowed bg-gray-100" : "hover:bg-[#1A1A1A] hover:text-white"
+3471-                          )}
+3472-                          disabled={checkingKeys.length > 0}
+3473-                        >
+3474-                          {checkingKeys.length > 0 ? `Đang check... (${checkingKeys.length})` : "Kiểm tra toàn bộ"}
+3475-                        </button>
+3476-                      </div>
+3477-                    </div>
+3478-
+3479-                    <div className="max-h-[350px] overflow-y-auto space-y-2 pr-2 custom-scrollbar border border-[#EEEAE5] rounded-2xl p-2 bg-[#F9F8F6]/50">
+3480-                      {geminiKeys.length === 0 ? (
+3481-                        <div className="flex flex-col items-center justify-center py-12 space-y-2 opacity-50">
+3482-                          <Database className="w-8 h-8 text-[#A09A94]" />
+3483-                          <p className="text-[9px] text-center text-[#A09A94] uppercase tracking-widest font-bold">Chưa có Key nào trong Database</p>
+3484-                        </div>
+3485-                      ) : (
+3486-                        <table className="w-full text-[10px]">
+--
+3525-                                    </div>
+3526-                                  </div>
+3527-                                </td>
+3528-                                <td className="py-3 px-2 text-right">
+3529-                                  <div className="flex items-center justify-end gap-1.5">
+3530:                                    <button 
+3531-                                      onClick={() => handleUpdateGeminiKey(k.id, { active: !k.active })}
+3532-                                      className={cn(
+3533-                                        "p-1.5 rounded-lg transition-all",
+3534-                                        k.active ? "text-emerald-500 hover:bg-emerald-50" : "text-gray-400 hover:bg-gray-100"
+3535-                                      )}
+3536-                                      title={k.active ? "Tạm dừng" : "Kích hoạt"}
+3537-                                    >
+3538-                                      {k.active ? <Activity className="w-4 h-4" /> : <ShieldAlert className="w-4 h-4" />}
+3539-                                    </button>
+3540:                                    <button 
+3541-                                      onClick={() => handleDeleteGeminiKey(k.id)}
+3542-                                      className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+3543-                                      title="Xóa vĩnh viễn"
+3544-                                    >
+3545-                                      <Trash2 className="w-4 h-4" />
+3546-                                    </button>
+3547-                                  </div>
+3548-                                </td>
+3549-                              </tr>
+3550-                            ))}
+3551-                          </tbody>
+3552-                        </table>
+3553-                      )}
+3554-                    </div>
+3555-                  </div>
+3556-
+3557-                  <div className="h-px bg-[#EEEAE5]" />
+3558-
+3559-                  <div className="space-y-4">
+3560-                    <div className="flex items-center justify-between">
+--
+3568-                        value={newLinkLabel}
+3569-                        onChange={(e) => setNewLinkLabel(e.target.value)}
+3570-                        placeholder="Tên khách hàng / Nhãn"
+3571-                        className="flex-1 px-4 py-2 bg-[#F9F8F6] border border-[#EEEAE5] rounded-lg text-xs"
+3572-                      />
+3573:                      <button 
+3574-                        onClick={handleCreateLink}
+3575-                        className="px-4 py-2 bg-[#1A1A1A] text-white rounded-lg text-[10px] font-bold uppercase whitespace-nowrap"
+3576-                      >
+3577-                        Tạo Link
+3578-                      </button>
+3579-                    </div>
+3580-
+3581-                    <div className="max-h-[300px] overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+3582-                      {adminLinks.length === 0 ? (
+3583-                        <p className="text-[10px] text-center py-6 text-[#A09A94] uppercase tracking-widest">Chưa có link nào được tạo</p>
+3584-                      ) : (
+3585-                        adminLinks.map((l: any) => {
+3586-                          const createdAt = new Date(l.created_at || Date.now());
+3587-                          const diffDays = Math.ceil(Math.abs(new Date().getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24));
+3588-                          const isExpired = !l.is_permanent && diffDays > 7;
+3589-
+3590-                          return (
+3591-                            <div key={l.id} className={cn("p-4 rounded-2xl border border-[#EEEAE5] space-y-3 group bg-[#FDFCFB]", !l.active && "opacity-60 grayscale")}>
+3592-                              <div className="flex items-center justify-between">
+3593-                                <div className="space-y-0.5">
+--
+3595-                                  <p className="text-[8px] text-[#A09A94] uppercase font-bold">
+3596-                                    {l.is_permanent ? "● Vĩnh viễn" : isExpired ? "● Hết hạn" : `● Dùng thử: Còn ${Math.max(0, 7 - diffDays)} ngày`}
+3597-                                  </p>
+3598-                                </div>
+3599-                                <div className="flex gap-1.5 flex-wrap">
+3600:                                  <button 
+3601-                                    onClick={() => handleUpdateLink(l.id, { active: !l.active })}
+3602-                                    className={cn("px-2 py-1.5 rounded text-[8px] font-bold uppercase transition-all shadow-sm shrink-0", l.active ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200" : "bg-orange-100 text-orange-700 hover:bg-orange-200")}
+3603-                                    title={l.active ? "Tạm dừng" : "Kích hoạt"}
+3604-                                  >
+3605-                                    {l.active ? "Đang chạy" : "Tạm dừng"}
+3606-                                  </button>
+3607-                                  {l.is_permanent ? (
+3608:                                    <button 
+3609-                                      onClick={() => handleUpdateLink(l.id, { isPermanent: false })}
+3610-                                      className="px-2 py-1.5 bg-amber-100 text-amber-700 rounded text-[8px] font-bold uppercase hover:bg-amber-200 transition-all shadow-sm shrink-0"
+3611-                                      title="Chuyển về dùng thử (7 ngày)"
+3612-                                    >
+3613-                                      Dùng thử
+3614-                                    </button>
+3615-                                  ) : (
+3616:                                    <button 
+3617-                                      onClick={() => handleUpdateLink(l.id, { isPermanent: true })}
+3618-                                      className="px-2 py-1.5 bg-blue-100 text-blue-700 rounded text-[8px] font-bold uppercase hover:bg-blue-200 transition-all shadow-sm shrink-0"
+3619-                                      title="Kích hoạt vĩnh viễn"
+3620-                                    >
+3621-                                      Kích hoạt
+3622-                                    </button>
+3623-                                  )}
+3624-                                </div>
+3625-                              </div>
+3626-
+3627-                              <div className="flex items-center justify-between text-[9px] text-[#A09A94] pt-2 border-t border-[#EEEAE5]/50">
+3628-                                <code className="bg-[#EEEAE5] px-1.5 py-1 rounded text-[8px] font-mono select-all">{l.token}</code>
+3629-                                <div className="flex items-center gap-2">
+3630-                                  <span className="font-bold uppercase tracking-tighter opacity-60">Dùng: {(l.usage?.pc?.length || 0) + (l.usage?.tablet?.length || 0) + (l.usage?.phone?.length || 0)}/3</span>
+3631-                                  <div className="flex gap-2">
+3632:                                    <button 
+3633-                                      onClick={() => {
+3634-                                        const url = `${window.location.origin}${window.location.pathname}?access=${l.token}`;
+3635-                                        navigator.clipboard.writeText(url);
+3636-                                        alert("Đã copy link gửi khách!");
+3637-                                      }}
+3638-                                      className="flex items-center gap-1 px-3 py-1.5 bg-white border border-[#EEEAE5] hover:bg-[#F9F8F6] rounded-md transition-all shadow-sm"
+3639-                                      title="Sao chép link gửi khách"
+3640-                                    >
+3641-                                      <Copy className="w-3.5 h-3.5 text-[#1A1A1A]" />
+3642-                                      <span className="text-[7px] font-bold uppercase">Sao chép</span>
+3643-                                    </button>
+3644:                                    <button 
+3645-                                      onClick={() => handleDeleteLink(l.id)}
+3646-                                      className="flex items-center gap-1 px-3 py-1.5 bg-red-50 border border-red-100 text-red-500 hover:bg-red-100 rounded-md transition-all shadow-sm"
+3647-                                      title="Xóa link này"
+3648-                                    >
+3649-                                      <Trash2 className="w-3.5 h-3.5" />
+3650-                                      <span className="text-[7px] font-bold uppercase">Xóa</span>
+3651-                                    </button>
+3652-                                  </div>
+3653-                                </div>
+3654-                              </div>
+3655-                            </div>
+3656-                          );
+3657-                        })
+3658-                      )}
+3659-                    </div>
+3660-                  </div>
+3661-                  
+3662:                  <button 
+3663-                    onClick={() => setIsAdminAuthenticated(false)}
+3664-                    className="w-full py-3 border border-[#EEEAE5] text-[#7A7570] rounded-xl text-[9px] font-bold uppercase tracking-widest hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition-all font-mono"
+3665-                  >
+3666-                    Đăng xuất Quản trị
+3667-                  </button>
+3668-                </div>
+3669-              )}
+3670-
+3671-              <div className="space-y-4">
+3672-                {keyStatus && (
+3673-                  <motion.div 
+3674-                    initial={{ opacity: 0, y: 5 }}
+3675-                    animate={{ opacity: 1, y: 0 }}
+3676-                    className="p-3 bg-blue-50 rounded-lg"
+3677-                  >
+3678-                    <p className="text-[10px] text-center text-blue-700 font-bold uppercase tracking-tight">{keyStatus}</p>
+3679-                  </motion.div>
+3680-                )}
+3681-                <div className="space-y-1">
+3682-                  <p className="text-[10px] text-center text-[#A09A94] italic leading-relaxed">
+--
+3708-              className="w-full max-w-md bg-white rounded-3xl p-8 shadow-2xl relative overflow-hidden"
+3709-            >
+3710-              <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-amber-500 to-amber-700" />
+3711-              
+3712-              <div className="absolute top-4 right-4">
+3713:                <button onClick={() => setShowTrialBlock(false)} className="p-2 text-[#A09A94] hover:text-[#1A1A1A] transition-colors rounded-full hover:bg-[#F9F8F6]">
+3714-                  <X className="w-5 h-5" />
+3715-                </button>
+3716-              </div>
+3717-
+3718-              <div className="text-center space-y-6 pt-4">
+3719-                <div className="w-16 h-16 mx-auto bg-amber-50 rounded-full flex items-center justify-center">
+3720-                  <Sparkles className="w-8 h-8 text-amber-600" />
+3721-                </div>
+3722-                
+3723-                <div className="space-y-2">
+3724-                  <h3 className="text-2xl font-light serif text-[#1A1A1A]">Trải nghiệm đã kết thúc</h3>
+3725-                  <p className="text-sm text-[#7A7570] leading-relaxed px-4">
+3726-                    Bạn đã sử dụng hết lượt hỏi tư vấn trải nghiệm. Để mở khóa đầy đủ tính năng và sử dụng không giới hạn, hãy kích hoạt phần mềm.
+3727-                  </p>
+3728-                </div>
+3729-
+3730-                <div className="bg-[#F9F8F6] p-6 rounded-2xl border border-[#EEEAE5] text-left space-y-4">
+3731-                  <p className="text-[10px] uppercase font-bold tracking-widest text-[#A09A94]">Thông tin Nhà Phát triển</p>
+3732-                  
+3733-                  {appInfo?.admin_name && (
+--
+3749-                      </a>
+3750-                    </div>
+3751-                  )}
+3752-                </div>
+3753-
+3754:                <button 
+3755-                  onClick={() => setShowTrialBlock(false)}
+3756-                  className="w-full py-4 bg-[#1A1A1A] text-white rounded-xl text-[10px] uppercase font-bold tracking-widest hover:bg-black transition-colors"
+3757-                >
+3758-                  Đóng
+3759-                </button>
+3760-              </div>
+3761-            </motion.div>
+3762-          </motion.div>
+3763-        )}
+3764-      </AnimatePresence>
+3765-
+3766-      {/* History Drawer/Modal */}
+3767-      <AnimatePresence>
+3768-        {showHistory && (
+3769-          <motion.div 
+3770-            initial={{ opacity: 0 }}
+3771-            animate={{ opacity: 1 }}
+3772-            exit={{ opacity: 0 }}
+3773-            className="fixed inset-0 z-[100] bg-black/40 backdrop-blur-sm flex justify-end"
+3774-            onClick={() => setShowHistory(false)}
+--
+3784-              <div className="p-6 border-b border-[#EEEAE5] flex items-center justify-between">
+3785-                <div className="flex items-center gap-2">
+3786-                  <History className="w-4 h-4" />
+3787-                  <h3 className="font-bold uppercase tracking-widest text-xs">Lịch sử tư vấn</h3>
+3788-                </div>
+3789:                <button onClick={() => setShowHistory(false)}><X className="w-5 h-5 text-[#7A7570]" /></button>
+3790-              </div>
+3791-              <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-4">
+3792-                {history.length === 0 ? (
+3793-                  <div className="h-full flex flex-col items-center justify-center text-[#A09A94] text-center space-y-4">
+3794-                    <History className="w-8 h-8 opacity-20" />
+3795-                    <p className="text-xs uppercase tracking-widest">Chưa có dữ liệu nào được lưu</p>
+3796-                  </div>
+3797-                ) : (
+3798-                  history.map(item => (
+3799-                    <div 
+3800-                      key={item.id}
+3801-                      className="group p-4 bg-[#F9F8F6] border border-[#EEEAE5] rounded-2xl hover:border-[#1A1A1A] transition-all cursor-pointer relative"
+3802-                      onClick={() => loadFromHistory(item)}
+3803-                    >
+3804-                      <div className="flex gap-4">
+3805-                        <div className="w-16 h-20 bg-white rounded-lg border border-[#EEEAE5] overflow-hidden shrink-0 flex items-center justify-center">
+3806-                          {(item.type === 'consult' || item.type === 'commentary') ? (
+3807-                            <img key={`img-${item.images.input || ''}`} src={item.images.input || ''} className="w-full h-full object-contain" />
+3808-                          ) : (
+3809-                            item.knowledgeImages && Object.values(item.knowledgeImages).length > 0 ? (
+--
+3828-                          {item.type === 'knowledge' && item.knowledgeImages && (
+3829-                            <p className="text-[9px] mt-2 text-[#7A7570]">{Object.keys(item.knowledgeImages).length} ảnh đã tạo</p>
+3830-                          )}
+3831-                        </div>
+3832-                      </div>
+3833:                      <button 
+3834-                        onClick={(e) => { e.stopPropagation(); removeFromHistory(item.id); }}
+3835-                        className="absolute top-2 right-2 p-2 text-[#A09A94] hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all bg-[#F9F8F6] rounded-full"
+3836-                      >
+3837-                        <Trash2 className="w-3.5 h-3.5" />
+3838-                      </button>
+3839-                    </div>
+3840-                  ))
+3841-                )}
+3842-              </div>
+3843-              <div className="p-6 border-t border-[#EEEAE5]">
+3844:                <button 
+3845-                  onClick={() => setShowHistory(false)}
+3846-                  className="w-full py-4 bg-[#1A1A1A] text-white text-[10px] font-bold uppercase tracking-widest rounded-xl hover:bg-black transition-all"
+3847-                >
+3848-                  Đóng lịch sử
+3849-                </button>
+3850-              </div>
+3851-            </motion.div>
+3852-          </motion.div>
+3853-        )}
+3854-      </AnimatePresence>
+3855-
+3856-      <main className="pt-20 h-screen flex flex-col md:flex-row">
+3857-        {/* Left Panel */}
+3858-        <section className="w-full md:w-[45%] lg:w-[40%] bg-white border-r border-[#EEEAE5] overflow-y-auto custom-scrollbar">
+3859-          <div className="p-8 lg:p-12 space-y-10">
+3860-            {activeTab === 'consult' ? (
+3861-              <>
+3862-                <header className="space-y-2">
+3863-                  <h2 className="text-3xl font-light leading-tight italic serif">Kiến tạo phong cách</h2>
+3864-                  <p className="text-sm text-[#7A7570] leading-relaxed">
+--
+3931-
+3932-                    <div className="space-y-2">
+3933-                      <label className="text-[9px] uppercase tracking-widest font-bold text-[#7A7570] block">Chọn phụ kiện tư vấn (Mặc định 2)</label>
+3934-                      <div className="flex flex-wrap gap-1.5 max-h-[120px] overflow-y-auto p-1 border border-dashed border-[#EEEAE5] rounded-lg">
+3935-                        {accessoryOptions.map(acc => (
+3936:                          <button
+3937-                            key={acc}
+3938-                            type="button"
+3939-                            onClick={() => {
+3940-                              setSelectedAccessories(prev => 
+3941-                                prev.includes(acc) ? prev.filter(a => a !== acc) : [...prev, acc]
+3942-                              );
+3943-                            }}
+3944-                            className={cn(
+3945-                              "px-2 py-1 rounded-full text-[9px] font-bold uppercase transition-all border",
+3946-                              selectedAccessories.includes(acc) 
+3947-                                ? "bg-[#1A1A1A] text-white border-[#1A1A1A]" 
+3948-                                : "bg-white text-[#7A7570] border-[#EEEAE5] hover:border-[#1A1A1A]"
+3949-                            )}
+3950-                          >
+3951-                            {acc}
+3952-                          </button>
+3953-                        ))}
+3954-                      </div>
+3955-                    </div>
+3956-
+3957-                    <div className="pt-2 flex flex-col gap-2">
+3958-                       <label className="text-[10px] uppercase tracking-widest font-bold text-[#7A7570]">Mức độ phân tích</label>
+3959-                       <div className="flex bg-[#F9F8F6] p-1 rounded-xl border border-[#EEEAE5] w-fit">
+3960:                         <button
+3961-                           type="button"
+3962-                           onClick={() => setDepthLevel('basic')}
+3963-                           className={cn(
+3964-                             "px-5 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
+3965-                             depthLevel === 'basic' ? "bg-white text-[#1A1A1A] shadow-sm" : "text-[#A09A94] hover:text-[#1A1A1A]"
+3966-                           )}
+3967-                         >
+3968-                           Cơ bản (Nhanh)
+3969-                         </button>
+3970:                         <button
+3971-                           type="button"
+3972-                           onClick={() => setDepthLevel('detailed')}
+3973-                           className={cn(
+3974-                             "px-5 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all",
+3975-                             depthLevel === 'detailed' ? "bg-white text-[#1A1A1A] shadow-sm" : "text-[#A09A94] hover:text-[#1A1A1A]"
+3976-                           )}
+3977-                         >
+3978-                           Chuyên sâu
+3979-                         </button>
+3980-                       </div>
+3981-                    </div>
+3982-
+3983-                    <div className="pt-2">
+3984:                       <button 
+3985-                        type="button" 
+3986-                        onClick={() => setShowFlawsInput(!showFlawsInput)}
+3987-                        className={cn(
+3988-                          "text-[10px] uppercase tracking-widest font-bold px-4 py-2 rounded-lg transition-all flex items-center gap-2",
+3989-                          showFlawsInput ? "bg-[#1A1A1A] text-white" : "bg-[#EEEAE5] text-[#7A7570] hover:bg-[#DDD6CE]"
+3990-                        )}
+3991-                       >
+3992-                         <AlertCircle className="w-3.5 h-3.5" />
+3993-                         {showFlawsInput ? "Ẩn tùy chọn che khuyết điểm" : "Tư vấn thêm: Che khuyết điểm cơ thể"}
+3994-                       </button>
+3995-                    </div>
+3996-
+3997-                    <AnimatePresence>
+3998-                      {showFlawsInput && (
+3999-                        <motion.div 
+4000-                          initial={{ height: 0, opacity: 0 }}
+4001-                          animate={{ height: 'auto', opacity: 1 }}
+4002-                          exit={{ height: 0, opacity: 0 }}
+4003-                          className="overflow-hidden space-y-2"
+4004-                        >
+--
+4013-                      )}
+4014-                    </AnimatePresence>
+4015-                  </div>
+4016-
+4017-                  <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
+4018:                    <button type="button" onClick={handleClearImage} className="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 transition-colors border border-red-100 shadow-sm">Xóa ảnh tải lên</button>
+4019-                    {(result || fullBodyImage) && (
+4020:                      <button type="button" onClick={handleClearResult} className="px-3 py-1.5 bg-orange-50 text-orange-600 rounded-lg text-xs font-medium hover:bg-orange-100 transition-colors border border-orange-100 shadow-sm">Xóa kết quả</button>
+4021-                    )}
+4022:                    <button type="button" onClick={handleResetTab} className="px-3 py-1.5 bg-[#F9F8F6] text-[#7A7570] rounded-lg text-xs font-medium hover:bg-[#EEEAE5] transition-colors border border-[#DDD6CE] shadow-sm">Làm mới Tab</button>
+4023-                  </div>
+4024-
+4025:                  <button 
+4026-                    type="submit" 
+4027-                    disabled={loading}
+4028-                    className="w-full py-4 bg-[#1A1A1A] text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-[#333] transition-colors disabled:opacity-50"
+4029-                  >
+4030-                    {loading ? (
+4031-                      queueTime > 0 ? (
+4032-                        <div className="flex flex-col items-center gap-1">
+4033-                          <div className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /><span className="text-yellow-400">Server quá tải. Đợi {queueTime}s...</span></div>
+4034-                          <span className="text-[8px] opacity-70">Thêm API Key cá nhân để bỏ qua hàng chờ</span>
+4035-                        </div>
+4036-                      ) : (
+4037-                        <><Loader2 className="w-5 h-5 animate-spin" /><span>Đang phân tích...</span></>
+4038-                      )
+4039-                    ) : <><span>Bắt đầu tư vấn</span><ChevronRight className="w-4 h-4" /></>}
+4040-                  </button>
+4041-                </form>
+4042-              </>
+4043-            ) : activeTab === 'commentary' ? (
+4044-              <>
+4045-                <header className="space-y-2 relative">
+4046-                  <h2 className="text-3xl font-light leading-tight italic serif">Bình luận phong thái</h2>
+4047-                  <p className="text-sm text-[#7A7570] leading-relaxed">
+4048-                    Tải lên ảnh trang phục hiện tại của bạn để nhận những lời khuyên chân thành và cách tối ưu hóa sự xuất hiện của mình.
+4049-                  </p>
+4050-                  {commentaryImage && !loading && (
+4051:                    <button 
+4052-                      onClick={() => { setCommentaryImage(null); setAnalysisResult(null); setImprovementImage(null); }}
+4053-                      className="absolute top-0 right-0 text-[10px] uppercase font-bold text-[#A09A94] hover:text-[#1A1A1A]"
+4054-                    >
+4055-                      Xóa ảnh
+4056-                    </button>
+4057-                  )}
+4058-                </header>
+4059-
+4060-                <form onSubmit={handleCommentary} className="space-y-8">
+4061-                  <div className="space-y-4">
+4062-                    <label className="text-[10px] uppercase tracking-widest font-bold text-[#7A7570]">Ảnh trang phục của bạn</label>
+4063-                    <div className="space-y-2">
+4064-      <div 
+4065-        onClick={() => commentaryInputRef.current?.click()}
+4066-        className={cn(
+4067-          "relative aspect-[3/4] rounded-2xl border border-dashed border-[#DDD6CE] bg-[#F9F8F6] cursor-pointer hover:border-[#1A1A1A] transition-all overflow-hidden group flex flex-col items-center justify-center gap-3",
+4068-          commentaryImage && "border-none"
+4069-        )}
+4070-      >
+4071-        <input type="file" ref={commentaryInputRef} className="hidden" accept="image/*,video/*" onChange={(e) => handleImageUpload(e, 'commentary')} />
+--
+4080-      </div>
+4081-   </div>
+4082-                  </div>
+4083-
+4084-                  <div className="flex flex-wrap gap-2 justify-center lg:justify-start">
+4085:                    <button type="button" onClick={handleClearImage} className="px-3 py-1.5 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 transition-colors border border-red-100 shadow-sm">Xóa ảnh tải lên</button>
+4086-                    {(analysisResult || commentaryImage) && (
+4087:                      <button type="button" onClick={handleClearResult} className="px-3 py-1.5 bg-orange-50 text-orange-600 rounded-lg text-xs font-medium hover:bg-orange-100 transition-colors border border-orange-100 shadow-sm">Xóa kết quả</button>
+4088-                    )}
+4089:                    <button type="button" onClick={handleResetTab} className="px-3 py-1.5 bg-[#F9F8F6] text-[#7A7570] rounded-lg text-xs font-medium hover:bg-[#EEEAE5] transition-colors border border-[#DDD6CE] shadow-sm">Làm mới Tab</button>
+4090-                  </div>
+4091-
+4092:                  <button 
+4093-                    type="submit" 
+4094-                    disabled={loading || !commentaryImage}
+4095-                    className="w-full py-4 bg-[#1A1A1A] text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-[#333] transition-colors disabled:opacity-50"
+4096-                  >
+4097-                    {loading ? <><Loader2 className="w-5 h-5 animate-spin" /><span>Đang thẩm định...</span></> : <><span>Xem bình luận</span><ChevronRight className="w-4 h-4" /></>}
+4098-                  </button>
+4099-                </form>
+4100-              </>
+4101-            ) : activeTab === 'knowledge' ? (
+4102-              <>
+4103-                <header className="space-y-2 relative">
+4104-                  <h2 className="text-3xl font-light leading-tight italic serif">Kiến thức Thời trang</h2>
+4105-                  <p className="text-sm text-[#7A7570] leading-relaxed">
+4106-                    Khám phá bách khoa toàn thư về thời trang. Hãy nhập bất kỳ câu hỏi hoặc chủ đề nào bạn muốn tìm hiểu.
+4107-                  </p>
+4108-                </header>
+4109-
+4110-                <form onSubmit={(e) => { e.preventDefault(); handleKnowledgeSearch(); }} className="space-y-8">
+4111-                  <div className="space-y-4">
+4112-                    <label className="text-[10px] uppercase tracking-widest font-bold text-[#7A7570]">Chủ đề / Yêu cầu</label>
+--
+4121-                  
+4122-                  <div className="space-y-3">
+4123-                    <label className="text-[10px] uppercase tracking-widest font-bold text-[#7A7570]">Gợi ý chủ đề</label>
+4124-                    <div className="flex flex-wrap gap-2">
+4125-                      {['Cách chọn áo sơ mi nam', 'Phối đồ cho bé gái', 'Thời trang tiệc tối U45', 'Sai lầm phối đồ nam', 'Bảng phối màu quần áo'].map((topic) => (
+4126:                        <button
+4127-                          key={topic}
+4128-                          type="button"
+4129-                          onClick={() => setKnowledgeQuery(topic)}
+4130-                          className="px-3 py-1.5 bg-[#EEEAE5] text-[#1A1A1A] text-xs rounded-full hover:bg-[#DDD6CE] transition-colors"
+4131-                        >
+4132-                          {topic}
+4133-                        </button>
+4134-                      ))}
+4135-                    </div>
+4136-                  </div>
+4137-
+4138:                  <button 
+4139-                    type="submit" 
+4140-                    disabled={isSearchingKnowledge || !knowledgeQuery.trim()}
+4141-                    className="w-full py-4 bg-[#1A1A1A] text-white rounded-xl font-medium flex items-center justify-center gap-2 hover:bg-[#333] transition-colors disabled:opacity-50"
+4142-                  >
+4143-                    {isSearchingKnowledge ? <><Loader2 className="w-5 h-5 animate-spin" /><span>Đang tìm kiếm...</span></> : <><span>Tìm hiểu ngay</span><ChevronRight className="w-4 h-4" /></>}
+4144-                  </button>
+4145-                </form>
+4146-              </>
+4147-            ) : activeTab === 'user' ? (
+4148-              <>
+4149-                <header className="space-y-4 relative">
+4150-                  <h2 className="text-3xl font-light leading-tight italic serif">Cấu hình Cá nhân</h2>
+4151-                  <p className="text-sm text-[#7A7570] leading-relaxed">
+4152-                    Cấu hình cửa hàng, mạng xã hội và API Key để loại bỏ mọi giới hạn hệ thống.
+4153-                  </p>
+4154-                </header>
+4155-
+4156-                <div className="space-y-4 pt-6 pb-6 border-b border-[#EEEAE5]">
+4157-                  <div className="flex items-center justify-between">
+4158-                    <div>
+--
+4182-                      value={userImageKey}
+4183-                      onChange={(e) => setUserImageKey(e.target.value)}
+4184-                      placeholder="AIzaSy..."
+4185-                      className="flex-1 px-4 py-3 bg-[#F9F8F6] border border-[#EEEAE5] rounded-xl text-xs focus:outline-none focus:border-[#1A1A1A] transition-colors font-mono"
+4186-                    />
+4187:                    <button 
+4188-                      onClick={handleUserCheckKey}
+4189-                      className="px-4 py-3 bg-[#1A1A1A] text-white rounded-xl font-medium tracking-widest text-[9px] uppercase hover:bg-black transition-colors shrink-0"
+4190-                    >
+4191-                      Lưu / Kiểm tra
+4192-                    </button>
+4193-                  </div>
+4194-                </div>
+4195-
+4196-                {!isUserUnlocked ? (
+4197-                  <div className="space-y-6 pt-10">
+4198-                    <div className="space-y-4">
+4199-                      <label className="text-[10px] uppercase tracking-widest font-bold text-[#7A7570]">
+4200-                        {userPassword ? 'Nhập mật khẩu' : 'Tạo mật khẩu mới'}
+4201-                      </label>
+4202-                      <input 
+4203-                        type="password"
+4204-                        value={tempUserPassword}
+4205-                        onChange={(e) => setTempUserPassword(e.target.value)}
+4206-                        placeholder="••••••••"
+4207-                        className="w-full px-4 py-3 bg-[#F9F8F6] border border-[#EEEAE5] rounded-xl text-sm focus:outline-none focus:border-[#1A1A1A] transition-colors"
+4208-                      />
+4209-                    </div>
+4210:                    <button 
+4211-                      onClick={() => {
+4212-                        if (!userPassword) {
+4213-                          if (tempUserPassword.length < 4) return alert("Mật khẩu phải từ 4 ký tự.");
+4214-                          setUserPassword(tempUserPassword);
+4215-                          localStorage.setItem('boutique_user_pwd', tempUserPassword);
+4216-                          setTempUserPassword('');
+4217-                          setIsUserUnlocked(true);
+4218-                        } else {
+4219-                          if (tempUserPassword === userPassword) {
+4220-                            setTempUserPassword('');
+4221-                            setIsUserUnlocked(true);
+4222-                          } else {
+4223-                            alert("Mật khẩu không đúng.");
+4224-                          }
+4225-                        }
+4226-                      }}
+4227-                      className="w-full py-4 bg-[#1A1A1A] text-white rounded-xl font-medium tracking-widest text-[10px] uppercase hover:bg-black transition-colors"
+4228-                    >
+4229-                      {userPassword ? 'Đăng nhập' : 'Lưu mật khẩu'}
+4230-                    </button>
+--
+4262-                      <p className="text-[9.5px] text-[#A09A94] leading-relaxed">
+4263-                        Cấu hình các liên kết phía trên, các ứng dụng truyền thông này sẽ được xuất hiện rõ dưới dạng "Liên hệ Tư vấn viên" ở các kết quả. Cực kỳ hiệu quả nếu bạn ghi hình / livestream kết quả tư vấn để người xem tìm tới bạn!
+4264-                      </p>
+4265-                    </div>
+4266-
+4267:                    <button className="w-full py-4 text-[#A09A94] text-[10px] border border-[#EEEAE5] uppercase tracking-widest font-bold rounded-xl" onClick={() => setIsUserUnlocked(false)}>
+4268-                      Khóa truy cập
+4269-                    </button>
+4270-                  </div>
+4271-                )}
+4272-              </>
+4273-            ) : null}
+4274-
+4275-            {error && (
+4276-              <div className="p-4 bg-red-50 border border-red-100 rounded-xl flex gap-3 text-red-600">
+4277-                <AlertCircle className="w-5 h-5 shrink-0" />
+4278-                <p className="text-xs">{error}</p>
+4279-              </div>
+4280-            )}
+4281-          </div>
+4282-        </section>
+4283-
+4284-        {/* Right Panel: Results */}
+4285-        <section className="w-full md:w-[55%] lg:w-[60%] bg-[#F9F8F6] overflow-y-auto relative custom-scrollbar">
+4286-          {/* Action Bar */}
+4287-          {((activeTab === 'consult' && result) || (activeTab === 'commentary' && analysisResult) || (activeTab === 'knowledge' && knowledgeResult)) && (
+4288-            <div className="absolute top-6 right-6 z-10 flex gap-2">
+4289:              <button 
+4290-                onClick={handleSaveToHistory}
+4291-                className="p-3 bg-white/80 backdrop-blur-sm border border-[#EEEAE5] rounded-full shadow-sm hover:bg-white transition-all group"
+4292-                title="Lưu kết quả"
+4293-              >
+4294-                <Save className="w-5 h-5 text-[#7A7570] group-hover:text-[#1A1A1A]" />
+4295-              </button>
+4296:              <button 
+4297-                onClick={() => setIsFullscreen(true)}
+4298-                className="p-3 bg-white/80 backdrop-blur-sm border border-[#EEEAE5] rounded-full shadow-sm hover:bg-white transition-all group"
+4299-                title="Toàn màn hình"
+4300-              >
+4301-                <Maximize2 className="w-5 h-5 text-[#7A7570] group-hover:text-[#1A1A1A]" />
+4302-              </button>
+4303-            </div>
+4304-          )}
+4305-          
+4306-          {(result || analysisResult) && (
+4307-            <div className="w-full bg-amber-50 border-b border-amber-100 p-4 pt-10 md:pt-4 text-center">
+4308-              <p className="text-[11.5px] md:text-sm text-amber-800 font-medium">Để dán câu lệnh và tạo ảnh AI, hãy mở: <a href="https://gemini.google.com/app" target="_blank" rel="noopener noreferrer" className="font-bold underline text-blue-600 hover:text-blue-800 block sm:inline mt-1 sm:mt-0 px-2 py-1 bg-white/50 rounded-md sm:bg-transparent sm:px-0 sm:py-0">https://gemini.google.com/app</a></p>
+4309-            </div>
+4310-          )}
+4311-
+4312-          <AnimatePresence mode="wait">
+4313-            {activeTab === 'consult' ? (
+4314-              <motion.div 
+4315-                key={result ? 'result-consult' : 'empty-consult'}
+4316-                initial={{ opacity: 0 }}
+--
+4355-                          <div className="space-y-2 order-2 lg:order-1 relative group">
+4356-                            <h6 className="text-[9px] uppercase tracking-widest font-bold text-[#A09A94] text-center">Gốc</h6>
+4357-                            <div className="aspect-[4/5] max-w-[80px] lg:max-w-none mx-auto bg-white rounded-xl border border-[#EEEAE5] overflow-hidden shadow-sm">
+4358-                              <img key={`img-${image}`} src={image} className="w-full h-full object-contain" />
+4359-                            </div>
+4360:                            <button 
+4361-                              onClick={() => setRemovedSlots(prev => [...prev, 'original'])}
+4362-                              className="absolute top-4 right-1/2 translate-x-[45px] lg:translate-x-0 lg:top-5 lg:right-[-10px] p-1 bg-white border border-[#EEEAE5] rounded-full shadow-sm text-[#A09A94] lg:opacity-0 lg:group-hover:opacity-100 transition-opacity z-10"
+4363-                            >
+4364-                              <X className="w-3 h-3" />
+4365-                            </button>
+4366-                          </div>
+4367-                        )}
+4368-                        
+4369-                        {!removedSlots.includes('full') && (
+4370-                          <div className="lg:col-span-1 space-y-3 order-3 relative group">
+4371-                            <div className="aspect-[4/5] lg:aspect-[3/4] max-w-[240px] lg:max-w-none mx-auto bg-white rounded-2xl lg:rounded-3xl border border-[#EEEAE5] overflow-hidden shadow-sm relative z-0">
+4372-                              <ColorPalette colors={result.colors} />
+4373-                              {(historyImages['full'] || []).length > 0 ? (
+4374-                                <>
+4375-                                  <div className="absolute inset-0 z-0 cursor-pointer overflow-hidden rounded-xl" onClick={() => setViewingImageModal(historyImages['full'][currentImageIndices['full'] || 0])}>
+4376-                                    {historyImages['full'][currentImageIndices['full'] || 0]?.match(/\.(mp4|webm|mov)($|\?|#)|#ext=\.(mp4|webm)/i) ? (
+4377-                                      <video key={`video-${historyImages['full'][currentImageIndices['full'] || 0]}`} src={historyImages['full'][currentImageIndices['full'] || 0]} autoPlay loop muted playsInline className="w-full h-full object-contain hover:scale-[1.01] transition-transform duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer" />
+4378-                                    ) : (
+4379-                                      <img key={`img-${historyImages['full'][currentImageIndices['full'] || 0]}`} src={historyImages['full'][currentImageIndices['full'] || 0]} className="w-full h-full object-contain hover:scale-[1.01] transition-transform duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer" />
+4380-                                    )}
+--
+4415-                                    </>
+4416-                                  )}
+4417-                                </div>
+4418-                              )}
+4419-                            </div>
+4420:                            <button 
+4421-                              onClick={() => setRemovedSlots(prev => [...prev, 'full'])}
+4422-                              className="absolute top-0 right-0 p-1 lg:p-2 bg-white/80 backdrop-blur-sm border border-[#EEEAE5] rounded-full shadow-sm text-[#A09A94] lg:opacity-0 lg:group-hover:opacity-100 transition-opacity z-20"
+4423-                            >
+4424-                              <X className="w-3 h-3 lg:w-4 lg:h-4" />
+4425-                            </button>
+4426-                            {(historyImages['full'] || []).length > 0 && (
+4427-                              <div className="space-y-4">
+4428-                                <VersionGallery 
+4429-                                  history={historyImages['full'] || []} 
+4430-                                  currentIndex={currentImageIndices['full'] || 0}
+4431-                                  onSetIndex={(idx) => setCurrentImageIndices(prev => ({ ...prev, full: idx }))}
+4432-                                  onRegen={() => generateMoreImage('full')}
+4433-                                  isGenerating={isGeneratingImg['full']}
+4434-                                />
+4435-                                <div className="p-4 bg-amber-500/5 border border-amber-500/20 rounded-xl">
+4436-                                  <p className="text-[9px] text-[#8B7E6D] italic leading-relaxed">
+4437-                                    Mẹo: Sử dụng nút "Copy" trên ảnh để lấy Prompt và dán vào <a href="https://gemini.google.com/app" target="_blank" className="font-bold underline text-amber-600 hover:text-amber-700 transition-colors">https://gemini.google.com/app</a> để tạo ảnh siêu nét bằng Gemini Image Generator.
+4438-                                  </p>
+4439-                                </div>
+4440-                              </div>
+--
+4491-                                        </>
+4492-                                      )}
+4493-                                    </div>
+4494-                                  )}
+4495-                                </div>
+4496:                                <button 
+4497-                                  onClick={() => setRemovedSlots(prev => [...prev, typeKey])}
+4498-                                  className="absolute top-9 right-4 lg:right-[-10px] p-1 bg-white/80 backdrop-blur-sm border border-[#EEEAE5] rounded-full shadow-sm text-[#A09A94] lg:opacity-0 lg:group-hover:opacity-100 transition-opacity z-20"
+4499-                                >
+4500-                                  <X className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
+4501-                                </button>
+4502-                                {(historyImages[typeKey] || []).length > 0 && (
+4503-                                  <VersionGallery 
+4504-                                    history={historyImages[typeKey] || []} 
+4505-                                    currentIndex={currentImageIndices[typeKey] || 0}
+4506-                                    onSetIndex={(idx) => setCurrentImageIndices(prev => ({ ...prev, [typeKey]: idx }))}
+4507-                                    onRegen={() => generateMoreImage(typeKey)}
+4508-                                    isGenerating={isGeneratingImg[typeKey]}
+4509-                                  />
+4510-                                )}
+4511-                              </div>
+4512-                            );
+4513-                          })
+4514-                        ) : (
+4515-                          !removedSlots.includes('detail') && (
+4516-                            <div className="aspect-[4/5] lg:aspect-[3/4] max-w-[240px] lg:max-w-none mx-auto bg-white rounded-2xl lg:rounded-3xl border border-[#EEEAE5] overflow-hidden shadow-sm relative group self-start lg:mt-7 order-1 z-0">
+--
+4565-                                  onSetIndex={(idx) => setCurrentImageIndices(prev => ({ ...prev, detail: idx }))}
+4566-                                  onRegen={() => generateMoreImage('detail')}
+4567-                                  isGenerating={isGeneratingImg['detail']}
+4568-                                />
+4569-                              )}
+4570:                              <button 
+4571-                                onClick={() => setRemovedSlots(prev => [...prev, 'detail'])}
+4572-                                className="absolute top-0 right-0 p-1 lg:p-2 bg-white/80 backdrop-blur-sm border border-[#EEEAE5] rounded-full shadow-sm text-[#A09A94] lg:opacity-0 lg:group-hover:opacity-100 transition-opacity z-20"
+4573-                              >
+4574-                                <X className="w-3 h-3 lg:w-3.5 lg:h-3.5" />
+4575-                              </button>
+4576-                            </div>
+4577-                          )
+4578-                        )}
+4579-                      </div>
+4580-                    </div>
+4581-
+4582-                    {/* 2. Advice Karaoke Below - Compact on mobile */}
+4583-                    <div className="w-full">
+4584-                      <AffiliateRecommendations links={result.affiliate_links} />
+4585-                      <KaraokeText 
+4586-                        text={result.advice} 
+4587-                        onHighlightChange={handleConsultHighlight}
+4588-                        disabled={Object.values(isGeneratingImg).some(Boolean)}
+4589-                        disabledMessage="Vui lòng chờ AI tạo xong toàn bộ ảnh minh họa trước khi phát."
+4590-                      />
+--
+4642-                                <h6 className="text-[9px] uppercase tracking-widest font-bold text-center text-[#A09A94]">Gốc</h6>
+4643-                                <div className="aspect-[4/5] max-w-[100px] lg:max-w-none mx-auto bg-white rounded-xl lg:rounded-3xl border border-[#EEEAE5] overflow-hidden shadow-sm relative group z-0">
+4644-                                  <img key={`img-${commentaryImage || ''}`} src={commentaryImage || ''} className="w-full h-full object-contain" />
+4645-                                  <FloatingImageActions url={commentaryImage || ''} name="current-outfit" />
+4646-                                </div>
+4647:                                <button 
+4648-                                  onClick={() => setRemovedSlots(prev => [...prev, 'commentary_original'])}
+4649-                                  className="absolute top-0 right-0 p-1 lg:p-2 bg-white/80 backdrop-blur-sm border border-[#EEEAE5] rounded-full shadow-sm text-[#A09A94] lg:opacity-0 lg:group-hover:opacity-100 transition-opacity z-20"
+4650-                                >
+4651-                                  <X className="w-3 h-3 lg:w-4 lg:h-4" />
+4652-                                </button>
+4653-                              </div>
+4654-                            )}
+4655-
+4656-                            {/* Improved Outfit - Last on mobile to be with Karaoke */}
+4657-                            {!removedSlots.includes('improvement') && (
+4658-                              <div className="space-y-2 order-2 lg:order-2 w-full relative group">
+4659-                                <h6 className="text-[9px] uppercase tracking-widest font-bold text-center text-[#A09A94]">Gợi ý cải thiện</h6>
+4660-                                <div className={cn(
+4661-                                  "aspect-[4/5] lg:aspect-[3/4] max-w-[240px] lg:max-w-none mx-auto bg-white rounded-2xl lg:rounded-3xl border border-[#EEEAE5] overflow-hidden shadow-sm relative flex flex-col items-center justify-center group z-0",
+4662-                                  (historyImages['improvement'] || []).length > 0 && "mb-2"
+4663-                                )}>
+4664-                                  <ColorPalette colors={analysisResult?.colors || []} />
+4665-                                  {(historyImages['improvement'] || []).length > 0 ? (
+4666-                                <>
+4667-                                  <div className="absolute inset-0 z-0 cursor-pointer overflow-hidden rounded-xl" onClick={() => setViewingImageModal(historyImages['improvement'][currentImageIndices['improvement'] || 0])}>
+--
+4705-                                        </>
+4706-                                      )}
+4707-                                    </div>
+4708-                                  )}
+4709-                                </div>
+4710:                                <button 
+4711-                                  onClick={() => setRemovedSlots(prev => [...prev, 'improvement'])}
+4712-                                  className="absolute top-0 right-0 p-1 lg:p-2 bg-white/80 backdrop-blur-sm border border-[#EEEAE5] rounded-full shadow-sm text-[#A09A94] lg:opacity-0 lg:group-hover:opacity-100 transition-opacity z-20"
+4713-                                >
+4714-                                  <X className="w-3 h-3 lg:w-4 lg:h-4" />
+4715-                                </button>
+4716-                                {(historyImages['improvement'] || []).length > 0 && (
+4717-                                  <div className="space-y-3">
+4718-                                    <VersionGallery 
+4719-                                      history={historyImages['improvement'] || []} 
+4720-                                      currentIndex={currentImageIndices['improvement'] || 0}
+4721-                                      onSetIndex={(idx) => setCurrentImageIndices(prev => ({ ...prev, improvement: idx }))}
+4722-                                      onRegen={() => generateMoreImage('improvement')}
+4723-                                      isGenerating={isGeneratingImg['improvement']}
+4724-                                    />
+4725-                                  </div>
+4726-                                )}
+4727-                              </div>
+4728-                            )}
+4729-                          </div>
+4730-                        </div>
+--
+4763-                  </div>
+4764-                ) : (
+4765-                  <div className="space-y-8 flex-1 overflow-y-auto no-scrollbar pb-10">
+4766-                    <div className="flex items-center justify-between pb-8 border-b border-[#EEEAE5]">
+4767-                      <h3 className="text-xl font-medium serif">{knowledgeResult.title}</h3>
+4768:                      <button onClick={() => setIsFullscreen(true)} className="p-3 bg-[#F9F8F6] rounded-full hover:bg-[#EEEAE5] transition-colors"><Maximize2 className="w-4 h-4 text-[#1A1A1A]" /></button>
+4769-                    </div>
+4770-
+4771-                    <div className="flex flex-col xl:flex-row gap-8">
+4772-                       <div className="w-full xl:w-[45%] shrink-0">
+4773-                         {knowledgeResult.media && (
+4774-                           <div className="flex flex-col gap-4">
+4775-                             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+4776-                               {knowledgeResult.media.map((item, idx) => {
+4777-                                 const imgKw = item.keywords.join(", ");
+4778-                                 const charFeature = gender === 'Nam' ? 'Vietnamese man named Nam, handsome, distinct facial features' : gender === 'Nữ' ? 'Vietnamese woman named Lan, beautiful, distinct facial features' : 'Vietnamese person, distinct facial features';
+4779-                                 const imagePrompt = `Vertical 9:16 aspect ratio (1080x1920) for TikTok: photorealistic portrait, ${charFeature}. Wearing detailed clothing based on: ${imgKw}. High quality, emotional lighting, cinematic composition.`;
+4780-                                 const videoPrompt = `A 8-seconds cinematic video of a ${charFeature}. Consistent character design: wearing specific detailed clothing (${imgKw}) including shirt, pants, shoes. Camera angle: dynamic tracking shot. Lighting: soft emotional sunlight, cinematic rim light. Setting/Background: realistic Vietnamese authentic background, depth of field. Motion: natural, slow motion, expressing deep emotion that touches the heart.`;
+4781-                                 return (
+4782-                                 <div key={idx} className={cn("relative rounded-xl overflow-hidden bg-[#EEEAE5] shadow-sm flex flex-col transition-all", currentKnowledgeMediaIndex === idx ? "ring-2 ring-[#1A1A1A]" : "")}>
+4783-                                   <div className="aspect-[3/4] relative w-full group overflow-hidden">
+4784-                                   {knowledgeImages[idx] ? (
+4785-                                      <div className="relative w-full h-full group">
+4786-                                        <div className="w-full h-full object-contain hover:scale-[1.01] transition-transform duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer" onClick={() => setViewingImageModal(knowledgeImages[idx])}>
+4787-                                           <MediaDisplay url={knowledgeImages[idx]} className="w-full h-full object-contain pointer-events-none" />
+4788-                                        </div>
+4789-                                        <WatermarkHider />
+4790:                                        <button 
+4791-                                          onClick={(e) => {
+4792-                                             e.stopPropagation();
+4793-                                             handleGenerateKnowledgeImage(idx, item.keywords);
+4794-                                          }}
+4795-                                          disabled={isGeneratingKnowledgeImage[idx]}
+4796-                                          className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black text-white rounded-full transition-colors opacity-0 group-hover:opacity-100 disabled:opacity-100 shadow-md backdrop-blur-sm"
+4797-                                          title="Tạo lại ảnh"
+4798-                                        >
+4799-                                          {isGeneratingKnowledgeImage[idx] ? <Loader2 className="w-3 h-3 animate-spin"/> : <RefreshCw className="w-3 h-3" />}
+4800-                                        </button>
+4801-                                      </div>
+4802-                                   ) : (
+4803-                                      <div className="p-4 flex flex-col items-center justify-center h-full gap-3 text-center">
+4804-                                        <div className="text-[9px] text-[#7A7570] font-medium leading-tight">Cảnh {idx + 1}</div>
+4805:                                        <button 
+4806-                                          onClick={() => handleGenerateKnowledgeImage(idx, item.keywords)}
+4807-                                          disabled={isGeneratingKnowledgeImage[idx]}
+4808-                                          className="px-3 py-1.5 bg-[#1A1A1A] text-white text-[10px] font-medium rounded-full hover:bg-[#333] transition-colors flex items-center justify-center gap-1 w-full"
+4809-                                        >
+4810-                                          {isGeneratingKnowledgeImage[idx] ? <><Loader2 className="w-3 h-3 animate-spin"/> <span>Đang tạo...</span></> : <span>Tạo Ảnh</span>}
+4811-                                        </button>
+4812-                                      </div>
+4813-                                   )}
+4814-                                  </div>
+4815-                                  <div className="p-2 flex flex-col gap-1 w-full bg-white border-t border-[#EEEAE5] shrink-0 relative z-20">
+4816-                                    <div className="flex gap-1 w-full">
+4817:                                      <button onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(imagePrompt); alert("Đã copy Prompt Ảnh!"); }} className="flex-1 text-[7px] font-bold py-1.5 px-0.5 bg-[#F9F8F6] border border-[#DDD6CE] rounded hover:bg-[#EAE5DF] text-[#1A1A1A] transition-colors" title="Copy Prompt Ảnh">📄 Prompt Ảnh (9:16 TikTok)</button>
+4818:                                      <button onClick={(e) => { e.stopPropagation(); navigator.clipboard.writeText(videoPrompt); alert("Đã copy Prompt Video Veo3 8s!"); }} className="flex-1 text-[7px] font-bold py-1.5 px-0.5 bg-[#F9F8F6] border border-[#DDD6CE] rounded hover:bg-[#EAE5DF] text-[#1A1A1A] transition-colors" title="Copy Prompt Video Veo3 8s">🎬 Prompt Video</button>
+4819-                                    </div>
+4820:                                    <button 
+4821-                                      onClick={(e) => { 
+4822-                                        e.stopPropagation(); 
+4823-                                        const fallbackUpload = () => {
+4824-                                           const input = document.createElement('input');
+4825-                                           input.type = 'file';
+4826-                                           input.accept = 'image/*,video/mp4,video/webm';
+4827-                                           input.onchange = (ev: any) => {
+4828-                                              const file = ev.target.files[0];
+4829-                                              if (file) setKnowledgeImages(prev => ({ ...prev, [idx]: URL.createObjectURL(file) + (file.type.startsWith('video/') ? '#ext=.mp4' : '') }));
+4830-                                           };
+4831-                                           input.click();
+4832-                                        };
+4833-                                        try {
+4834-                                           navigator.clipboard.readText().then(text => {
+4835-                                              if (text && (text.startsWith('http') || text.startsWith('data:'))) {
+4836-                                                 if (confirm('Dán link này?\n' + text.substring(0,50) + '...')) {
+4837-                                                    setKnowledgeImages(prev => ({ ...prev, [idx]: text.trim() }));
+4838-                                                    return;
+4839-                                                 }
+4840-                                              }
+--
+4867-                                </div>
+4868-                               )})} 
+4869-                             </div>
+4870-                             
+4871-                             <div className="flex justify-center">
+4872:                               <button 
+4873-                                 onClick={async () => {
+4874-                                    const toGenerate = knowledgeResult.media.map((m, idx) => ({m, idx}))
+4875-                                      .filter(({idx}) => !knowledgeImages[idx] && !isGeneratingKnowledgeImage[idx]);
+4876-                                    
+4877-                                    for (const item of toGenerate) {
+4878-                                       await handleGenerateKnowledgeImage(item.idx, item.m.keywords);
+4879-                                       await new Promise(r => setTimeout(r, 2000));
+4880-                                    }
+4881-                                 }}
+4882-                                 className="px-5 py-2.5 bg-[#1A1A1A]/5 hover:bg-[#1A1A1A]/10 text-[#1A1A1A] text-[10px] font-bold tracking-widest uppercase rounded-full transition-colors flex items-center justify-center gap-2"
+4883-                               >
+4884-                                  <span>Tạo Tất Cả Ảnh</span>
+4885-                               </button>
+4886-                             </div>
+4887-                           </div>
+4888-                         )}
+4889-                       </div>
+4890-
+4891-                       <div className="w-full xl:w-[55%]">
+4892-                         <AffiliateRecommendations links={knowledgeResult.affiliate_links} />
+--
+4910-            animate={{ opacity: 1 }}
+4911-            exit={{ opacity: 0 }}
+4912-            className="fixed inset-0 z-[300] bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm"
+4913-            onClick={() => setViewingImageModal(null)}
+4914-          >
+4915:            <button 
+4916-              onClick={() => setViewingImageModal(null)}
+4917-              className="absolute top-6 right-6 p-3 bg-white/10 text-white rounded-full hover:bg-white/20 transition-all z-[310]"
+4918-            >
+4919-              <X className="w-5 h-5" />
+4920-            </button>
+4921-            <motion.div 
+4922-              initial={{ scale: 0.95 }}
+4923-              animate={{ scale: 1 }}
+4924-              exit={{ scale: 0.95 }}
+4925-              className="relative max-w-[90vw] max-h-[90vh] overflow-hidden rounded-lg"
+4926-              onClick={e => e.stopPropagation()}
+4927-            >
+4928-              <MediaDisplay url={viewingImageModal} className="w-[90vw] h-[90vh] object-contain scale-[1.08] shadow-2xl" />
+4929-              <FloatingImageActions 
+4930-                url={viewingImageModal} 
+4931-                name="fashion-view" 
+4932-              />
+4933-            </motion.div>
+4934-          </motion.div>
+4935-        )}
+--
+5012-                    <div className="absolute top-0 inset-x-0 p-4 bg-gradient-to-b from-black/80 to-transparent z-[210] opacity-0 group-hover:opacity-100 transition-opacity flex justify-between items-start pointer-events-none">
+5013-                      <div className="text-white">
+5014-                        <p className="text-[10px] font-bold uppercase tracking-widest text-red-500 flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> {isGeneratingAny ? "Đang chờ ảnh..." : "Chế độ quay màn hình"}</p>
+5015-                        <p className="text-[9px] text-white/50 mt-1">Bật quay màn hình điện thoại/máy tính có thu âm thanh hệ thống để xuất video chuẩn 9:16 TikTok.</p>
+5016-                      </div>
+5017:                      <button 
+5018-                        onClick={() => setIsFullscreen(false)}
+5019-                        className="p-3 bg-white/10 text-white rounded-full hover:bg-white/20 transition-all backdrop-blur-md pointer-events-auto"
+5020-                      >
+5021-                        <X className="w-5 h-5" />
+5022-                      </button>
+5023-                    </div>
+5024-
+5025-                    <div className={cn("w-full relative min-h-0 bg-[#0a0a0a]", globalKaraokeLayoutType === 'word' ? "h-full" : "h-[65%]")}>
+5026-                       {isGeneratingAny && totalExpected > 0 && (
+5027-                         <div className="absolute top-16 right-4 z-[210] pointer-events-none bg-black/60 text-white text-[10px] px-3 py-1.5 rounded-full flex items-center gap-2 backdrop-blur-md border border-white/10 animate-fade-in shadow-xl">
+5028-                           <Loader2 className="w-3 h-3 animate-spin"/> Đã tạo {generatedCount}/{totalExpected} ảnh
+5029-                         </div>
+5030-                       )}
+5031-                       {currentMain ? (
+5032-                         <>
+5033-                           <div className="absolute inset-0 z-0 cursor-pointer overflow-hidden rounded-xl" onClick={() => setViewingImageModal(currentMain)}>
+5034-                             {currentMain?.match(/\.(mp4|webm|mov)($|\?|#)|#ext=\.(mp4|webm)/i) ? (
+5035-                               <video key={`video-${currentMain}`} src={currentMain} autoPlay loop muted playsInline className={cn("w-full h-full hover:scale-[1.01] transition-transform duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2", globalKaraokeLayoutType === 'word' ? 'object-cover' : 'object-contain')} />
+5036-                             ) : (
+5037-                               <img key={`img-${currentMain}`} src={currentMain} className={cn("w-full h-full hover:scale-[1.01] transition-transform duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2", globalKaraokeLayoutType === 'word' ? 'object-cover' : 'object-contain')} />
+--
+5044-                       )}
+5045-
+5046-                       {currentThumb && currentThumb !== currentMain && (
+5047-                         <div className="absolute top-4 bottom-auto md:top-auto md:bottom-20 left-4 z-[205] flex flex-col items-start gap-1">
+5048-                           <span className="text-[10px] font-bold uppercase tracking-widest text-white/70 bg-black/50 px-2 py-0.5 rounded backdrop-blur-md shadow-lg">{thumbLabel}</span>
+5049:                           <button 
+5050-                             onClick={() => {
+5051-                               setKaraokeViewType('');
+5052-                               setFsMainTab(fsMainTab === 'original' ? 'generated' : 'original');
+5053-                             }}
+5054-                             className="relative w-16 h-24 sm:w-20 sm:h-28 border-2 border-white/40 rounded-xl overflow-hidden shadow-2xl hover:scale-105 transition-transform bg-black/50"
+5055-                           >
+5056-                             <div className="absolute inset-0 z-0 cursor-pointer overflow-hidden rounded-xl">
+5057-                               {currentThumb?.match(/\.(mp4|webm|mov)($|\?|#)|#ext=\.(mp4|webm)/i) ? (
+5058-                                 <video key={`video-${currentThumb}`} src={currentThumb} autoPlay loop muted playsInline className="w-full h-full object-contain hover:scale-[1.01] transition-transform duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+5059-                               ) : (
+5060-                                 <img key={`img-${currentThumb}`} src={currentThumb} className="w-full h-full object-contain hover:scale-[1.01] transition-transform duration-500 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+5061-                               )}
+5062-                             </div>
+5063-                           <WatermarkHider />
+5064-                           </button>
+5065-                         </div>
+5066-                       )}
+5067-                       
+5068-                       {mainLabel && (
+5069-                         <div className="absolute top-6 left-1/2 -translate-x-1/2 z-[205] opacity-0 group-hover:opacity-100 transition-opacity">
+--
+5072-                       )}
+5073-
+5074-                       {/* Manual View Selectors hover trigger */}
+5075-                       {!isKnowledge && (
+5076-                         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[215] flex gap-2 overflow-x-auto max-w-full px-4 hide-scrollbar opacity-0 group-hover:opacity-100 transition-opacity">
+5077:                           <button onClick={() => setKaraokeViewType('original')} className={cn("px-3 py-1 rounded-full text-[10px] whitespace-nowrap", karaokeViewType === 'original' ? 'bg-white text-black' : 'bg-black/50 text-white')}>Ảnh Gốc</button>
+5078:                           <button onClick={() => setKaraokeViewType('full')} className={cn("px-3 py-1 rounded-full text-[10px] whitespace-nowrap", karaokeViewType === 'full' ? 'bg-white text-black' : 'bg-black/50 text-white')}>Toàn Thân</button>
+5079-                           {result?.detailPrompts?.map(dp => (
+5080:                             <button key={dp.name} onClick={() => setKaraokeViewType(`detail_${dp.name}`)} className={cn("px-3 py-1 rounded-full text-[10px] whitespace-nowrap", karaokeViewType === `detail_${dp.name}` ? 'bg-white text-black' : 'bg-black/50 text-white')}>{dp.name}</button>
+5081-                           ))}
+5082-                         </div>
+5083-                       )}
+5084-                    </div>
+5085-                    
+5086-                    <div className={cn("w-full flex flex-col items-center justify-start z-[205] border-t border-white/10 shrink-0 overflow-visible relative", globalKaraokeLayoutType === 'word' ? "absolute inset-0 bg-transparent pointer-events-none border-none" : "h-[35%] bg-black px-2 sm:px-4 py-4")}>
+5087-                      <div className="w-full h-full flex flex-col overflow-visible relative">
+5088-                        <KaraokeText 
+5089-                          text={textStr} 
+5090-                          isFullscreen={true} 
+5091-                          onHighlightChange={
+5092-                            isKnowledge ? handleKnowledgeHighlight : 
+5093-                            (activeTab === 'consult' ? handleConsultHighlight : 
+5094-                            (activeTab === 'commentary' ? handleCommentaryHighlight : undefined))
+5095-                          }
+5096-                          disabled={Object.values(isGeneratingImg).some(Boolean)}
+5097-                          disabledMessage="Vui lòng chờ AI tạo xong toàn bộ ảnh minh họa trước khi phát."
+5098-                        />
+5099-                      </div>
+5100-                    </div>

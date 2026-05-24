@@ -1,0 +1,10 @@
+{
+  "name": "Remix: Remix: Chuyên Gia Thời Trang AI",
+  "description": "Tư vấn thời trang cá nhân hóa dựa trên đặc điểm khuôn mặt, vóc dáng và bối cảnh sử dụng.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
